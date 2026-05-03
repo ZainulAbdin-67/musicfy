@@ -7,13 +7,15 @@ function Playlists() {
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const { token } = useSelector(state => state.auth);
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
   useEffect(() => {
     fetchPlaylists();
   }, [token]);
 
   const fetchPlaylists = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/playlists', {
+      const response = await axios.get(`${API_URL}/playlists`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPlaylists(response.data);
@@ -26,7 +28,7 @@ function Playlists() {
     e.preventDefault();
     try {
       await axios.post(
-        'http://localhost:5000/api/playlists',
+        `${API_URL}/playlists`,
         { name: newPlaylistName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
