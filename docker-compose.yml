@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:5.0
+    container_name: musicfy_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - musicfy_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: musicfy_backend
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: mongodb://root:password@mongodb:27017/musicfy
+      JWT_SECRET: your-secret-key
+      NODE_ENV: production
+    depends_on:
+      - mongodb
+    networks:
+      - musicfy_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: musicfy_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - musicfy_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  musicfy_network:
+    driver: bridge
